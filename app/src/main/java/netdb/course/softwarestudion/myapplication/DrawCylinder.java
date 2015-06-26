@@ -71,39 +71,11 @@ public class DrawCylinder
 
             float z1 = (float) (circle_radius*Math.cos(Math.toRadians(circle_degree)));
 
-         /*   float a1=0;
-
-            float b1=y1;
-
-            float c1=z1;
-
-            float l1=getVectorLength(a1, b1, c1);//模長
-
-           /a1=a1/l1;//法向量規格化
-
-            b1=b1/l1;
-
-            c1=c1/l1;*/
-
             float x2 =(float)(-length);
 
             float y2=(float) (circle_radius*Math.sin(Math.toRadians(circle_degree-degreespan)));
 
             float z2=(float) (circle_radius*Math.cos(Math.toRadians(circle_degree-degreespan)));
-
-         /*   float a2=0;
-
-            float b2=y2;
-
-            float c2=z2;
-
-            float l2=getVectorLength(a2, b2, c2);//模長
-
-            a2=a2/l2;//法向量規格化
-
-            b2=b2/l2;
-
-            c2=c2/l2;*/
 
             float x3 =(float)(0);
 
@@ -111,39 +83,11 @@ public class DrawCylinder
 
             float z3=(float) (circle_radius*Math.cos(Math.toRadians(circle_degree-degreespan)));
 
-      /*      float a3=0;
-
-            float b3=y3;
-
-            float c3=z3;
-
-            float l3=getVectorLength(a3, b3, c3);//模長
-
-           a3=a3/l3;//法向量規格化
-
-           b3=b3/l3;
-
-            c3=c3/l3;*/
-
             float x4 =(float)(0);
 
             float y4=(float) (circle_radius*Math.sin(Math.toRadians(circle_degree)));
 
             float z4=(float) (circle_radius*Math.cos(Math.toRadians(circle_degree)));
-
-     /*      float a4=0;
-
-            float b4=y4;
-
-            float c4=z4;
-
-            float l4=getVectorLength(a4, b4, c4);//模長
-
-            a4=a4/l4;//法向量規格化
-
-            b4=b4/l4;
-
-           c4=c4/l4;*/
 
             val.add(x4);val.add(y4);val.add(z4);//兩個三角形，共6個頂點的坐標
 
@@ -157,17 +101,6 @@ public class DrawCylinder
 
             val.add(x2);val.add(y2);val.add(z2);
 
-          /*  ial.add(a1);ial.add(b1);ial.add(c1);//頂點對應的法向量
-
-            ial.add(a2);ial.add(b2);ial.add(c2);
-
-            ial.add(a4);ial.add(b4);ial.add(c4);
-
-            ial.add(a2);ial.add(b2);ial.add(c2);
-
-            ial.add(a3);ial.add(b3);ial.add(c3);
-
-            ial.add(a4);ial.add(b4);ial.add(c4);*/
 
         }
 
@@ -178,11 +111,8 @@ public class DrawCylinder
         float[] vertexs=new float[vCount*3];
 
         for(int i=0;i<vCount*3;i++)
-
         {
-
             vertexs[i]=val.get(i);
-
         }
 
         ByteBuffer vbb=ByteBuffer.allocateDirect(vertexs.length*4);
@@ -194,28 +124,6 @@ public class DrawCylinder
         myVertexBuffer.put(vertexs);
 
         myVertexBuffer.position(0);
-
-//法向量
-
-     /*   float[] normals=new float[vCount*3];
-
-        for(int i=0;i<vCount*3;i++)
-
-        {
-
-            normals[i]=ial.get(i);
-
-        }
-
-        ByteBuffer ibb=ByteBuffer.allocateDirect(normals.length*4);
-
-        ibb.order(ByteOrder.nativeOrder());
-
-        myNormalBuffer=ibb.asFloatBuffer();
-
-        myNormalBuffer.put(normals);
-
-        myNormalBuffer.position(0);*/
 
 //紋理
 

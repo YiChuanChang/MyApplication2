@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -21,6 +22,8 @@ import javax.microedition.khronos.opengles.GL11;
 public class MyGLSurfaceView extends GLSurfaceView {
 
     private final float TOUCH_SCALE_FACTOR = 180.0f/320;//角度縮放比例
+
+
 
     private final float BLOCK_LENGTH = 20f;
 
@@ -70,8 +73,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
             */
             case MotionEvent.ACTION_UP:
 
-                mRenderer.cylinder.deepX += BLOCK_LENGTH/2;
-
+                for(DrawCylinder cylinder:mRenderer.cylinderList){
+                   cylinder.deepX += BLOCK_LENGTH/2;
+                }
+                mRenderer.isTouch=true;
                 requestRender();//重繪畫面
 
         }
@@ -87,7 +92,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
     }
 
     public boolean onSensorEvent(SensorEvent e){
-        mRenderer.cylinder.mAngleX += e.values[1]*10;
+        for(DrawCylinder cylinder:mRenderer.cylinderList){
+            cylinder.mAngleX += e.values[1]*10;
+        }
         requestRender();
         return true;
     }
@@ -95,11 +102,18 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private class SceneRenderer implements GLSurfaceView.Renderer
     {
         int textureId;//紋理名稱ID
-
+        private boolean isTouch;
+        ArrayList<DrawCylinder> cylinderList;
         DrawCylinder cylinder;//創建圓柱體
+        DrawCylinder cylinder2;
         public SceneRenderer()
         {
-            cylinder = new DrawCylinder(BLOCK_LENGTH,20f,60f,2);//創建圓柱體 length, circle_radius, degreespan, textureId
+            isTouch=false;
+            cylinderList=new ArrayList();
+            cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
+            cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
+            cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
+           // cylinder =new DrawCylinder(BLOCK_LENGTH,20f,60f,2) ;//創建圓柱體 length, circle_radius, degreespan, textureId
         }
         public void onDrawFrame(GL10 gl) {
         //清除顏色緩存
@@ -135,16 +149,25 @@ public class MyGLSurfaceView extends GLSurfaceView {
             gl.glRotatef(-45, 0, 1, 0);//旋轉
 
             initLight(gl);//開燈
+            if(isTouch){
+                cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
+                isTouch=false;
+            }
 
-            cylinder.drawSelf(gl);//繪製
+            for(int i=0;i<cylinderList.size();i++){
+                autoGenerateBlock(gl,cylinderList.get(i));
+            }
+          //  cylinder.drawSelf(gl);//繪製
 
-            gl.glTranslatef(-BLOCK_LENGTH-1, 0, 0);
 
-            cylinder.drawSelf(gl);
+          //  gl.glTranslatef(-BLOCK_LENGTH-1, 0, 0);
+           // cylinder2.drawSelf(gl);
+           // cylinder.drawSelf(gl);
 
-            gl.glTranslatef(-BLOCK_LENGTH-1, 0, 0);
 
-            cylinder.drawSelf(gl);
+
+
+
 
             closeLight(gl);//關燈
 
@@ -222,6 +245,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         }
 
+    }
+    public void autoGenerateBlock(GL10 gl,DrawCylinder cylinder){
+        cylinder.drawSelf(gl);
+        gl.glTranslatef(-BLOCK_LENGTH+1, 0, 0);
     }
 
  //初始化白色燈

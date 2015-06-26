@@ -231,6 +231,7 @@ public class DrawCylinder
 
     }
 
+
     public void drawSelf(GL10 gl)
     {
         gl.glRotatef(mAngleX, 1, 0, 0);//旋轉

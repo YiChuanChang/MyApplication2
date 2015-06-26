@@ -329,7 +329,9 @@ public class DrawCylinder
             result[c++]=t;
 
         }
-
+        for(int i=0;i<bh*6*2;i+=2) {
+            System.out.println(result[i]+" "+result[i+1]);
+        }
         return result;
 
     }

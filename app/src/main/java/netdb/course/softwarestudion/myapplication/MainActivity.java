@@ -1,15 +1,13 @@
 package netdb.course.softwarestudion.myapplication;
 
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
-import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowManager;
-
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
 
 public class MainActivity extends Activity implements SensorEventListener {
@@ -29,7 +27,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
             mGLSurfaceView = new MyGLSurfaceView(this);
-
+            mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
             setContentView(mGLSurfaceView);
 
             mGLSurfaceView.setFocusableInTouchMode(true);//設置為可觸控

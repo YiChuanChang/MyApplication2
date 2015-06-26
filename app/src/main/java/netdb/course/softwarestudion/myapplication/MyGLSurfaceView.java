@@ -113,10 +113,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
             isTouch=false;
             cylinderList=new ArrayList();
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
-            cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
+           /* cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
             cylinderList.get(1).deepX -= BLOCK_LENGTH;
-            cylinderList.get(2).deepX -= 2*BLOCK_LENGTH;
+            cylinderList.get(2).deepX -= 2*BLOCK_LENGTH;*/
            // cylinder =new DrawCylinder(BLOCK_LENGTH,20f,60f,2) ;//創建圓柱體 length, circle_radius, degreespan, textureId
         }
 

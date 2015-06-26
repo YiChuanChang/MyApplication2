@@ -51,6 +51,8 @@ public class DrawCylinder
 
         this.textureId=textureId;
 
+        this.deepX = 0;
+
         float collength=(float)length;//圓柱每塊所佔的長度
 
         int spannum=(int)(360.0f/degreespan);
@@ -63,7 +65,7 @@ public class DrawCylinder
 
         {
 
-            float x1 = (float)(-length/2);
+            float x1 = (float)(-length);
 
             float y1 = (float) (circle_radius*Math.sin(Math.toRadians(circle_degree)));
 
@@ -83,7 +85,7 @@ public class DrawCylinder
 
             c1=c1/l1;*/
 
-            float x2 =(float)(-length/2);
+            float x2 =(float)(-length);
 
             float y2=(float) (circle_radius*Math.sin(Math.toRadians(circle_degree-degreespan)));
 
@@ -103,7 +105,7 @@ public class DrawCylinder
 
             c2=c2/l2;*/
 
-            float x3 =(float)(length/2);
+            float x3 =(float)(0);
 
             float y3=(float) (circle_radius*Math.sin(Math.toRadians(circle_degree-degreespan)));
 
@@ -123,7 +125,7 @@ public class DrawCylinder
 
             c3=c3/l3;*/
 
-            float x4 =(float)(length/2);
+            float x4 =(float)(0);
 
             float y4=(float) (circle_radius*Math.sin(Math.toRadians(circle_degree)));
 

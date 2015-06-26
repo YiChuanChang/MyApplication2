@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
+import android.util.Log;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 
@@ -74,8 +75,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
             case MotionEvent.ACTION_UP:
 
                 for(DrawCylinder cylinder:mRenderer.cylinderList){
-                   cylinder.deepX += BLOCK_LENGTH/2;
+                   cylinder.deepX += BLOCK_LENGTH;
                 }
+                Log.d("cycles", Integer.toString(mRenderer.cylinderList.size()) );
                 mRenderer.isTouch=true;
                 requestRender();//重繪畫面
 
@@ -113,8 +115,11 @@ public class MyGLSurfaceView extends GLSurfaceView {
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
+            cylinderList.get(1).deepX -= BLOCK_LENGTH;
+            cylinderList.get(2).deepX -= 2*BLOCK_LENGTH;
            // cylinder =new DrawCylinder(BLOCK_LENGTH,20f,60f,2) ;//創建圓柱體 length, circle_radius, degreespan, textureId
         }
+
         public void onDrawFrame(GL10 gl) {
         //清除顏色緩存
 
@@ -142,20 +147,24 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
             initMaterial(gl);//初始化紋理
 
-            //gl.glTranslatef(0, 0, -10f);//平移
+            gl.glTranslatef(0, 0, -10f);//平移
 
             gl.glRotatef(-90, 0, 0, 1);//旋轉
 
             gl.glRotatef(-45, 0, 1, 0);//旋轉
 
             initLight(gl);//開燈
+
             if(isTouch){
                 cylinderList.add(new DrawCylinder(BLOCK_LENGTH,20f,60f,2));
+                cylinderList.get(cylinderList.size()-1).deepX -= 2*BLOCK_LENGTH;
+                cylinderList.get(cylinderList.size()-1).mAngleX = cylinderList.get(cylinderList.size()-2).mAngleX;
                 isTouch=false;
             }
 
             for(int i=0;i<cylinderList.size();i++){
                 autoGenerateBlock(gl,cylinderList.get(i));
+                Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
             }
           //  cylinder.drawSelf(gl);//繪製
 
@@ -246,9 +255,11 @@ public class MyGLSurfaceView extends GLSurfaceView {
         }
 
     }
+
     public void autoGenerateBlock(GL10 gl,DrawCylinder cylinder){
+        gl.glPushMatrix();
         cylinder.drawSelf(gl);
-        gl.glTranslatef(-BLOCK_LENGTH+1, 0, 0);
+        gl.glPopMatrix();
     }
 
  //初始化白色燈

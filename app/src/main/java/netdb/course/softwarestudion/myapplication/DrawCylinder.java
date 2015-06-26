@@ -101,6 +101,11 @@ public class DrawCylinder
 
             val.add(x2);val.add(y2);val.add(z2);
 
+          /*  Log.d("C1=", Float.toString(y1)+" "+Float.toString(z1));
+            Log.d("C2=", Float.toString(y2)+" "+Float.toString(z2));
+            Log.d("C3=", Float.toString(y3)+" "+Float.toString(z3));
+            Log.d("C4=", Float.toString(y4)+" "+Float.toString(z4));*/
+
 
         }
 
@@ -237,9 +242,7 @@ public class DrawCylinder
             result[c++]=t;
 
         }
-        for(int i=0;i<bh*6*2;i+=2) {
-            System.out.println(result[i]+" "+result[i+1]);
-        }
+
         return result;
 
     }

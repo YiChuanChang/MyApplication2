@@ -145,17 +145,17 @@ public class DrawCylinder
 
            c4=c4/l4;*/
 
-            val.add(x1);val.add(y1);val.add(z1);//兩個三角形，共6個頂點的坐標
+            val.add(x4);val.add(y4);val.add(z4);//兩個三角形，共6個頂點的坐標
 
-            val.add(x2);val.add(y2);val.add(z2);
-
-            val.add(x4);val.add(y4);val.add(z4);
-
-            val.add(x2);val.add(y2);val.add(z2);
+            val.add(x1);val.add(y1);val.add(z1);
 
             val.add(x3);val.add(y3);val.add(z3);
 
-            val.add(x4);val.add(y4);val.add(z4);
+            val.add(x3);val.add(y3);val.add(z3);
+
+            val.add(x1);val.add(y1);val.add(z1);
+
+            val.add(x2);val.add(y2);val.add(z2);
 
           /*  ial.add(a1);ial.add(b1);ial.add(c1);//頂點對應的法向量
 
@@ -260,7 +260,7 @@ public class DrawCylinder
 
         gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
 
-        gl.glDrawArrays(GL10.GL_TRIANGLES, 0, vCount);//繪製圖像面
+        //gl.glDrawArrays(GL10.GL_TRIANGLES, 0, vCount);//繪製圖像面
 
         gl.glColor4f(1f, 0f, 0f, 1f);//繪製線的顏色
 

@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
             mGLSurfaceView = new MyGLSurfaceView(this);
-            mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
+            //mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
             setContentView(mGLSurfaceView);
 
             mGLSurfaceView.setFocusableInTouchMode(true);//設置為可觸控

@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.hardware.SensorEvent;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import java.io.IOException;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
-import android.util.Log;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 

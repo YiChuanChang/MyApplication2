@@ -2,17 +2,17 @@ package netdb.course.softwarestudion.myapplication;
 
 import netdb.course.softwarestudion.myapplication.util.SystemUiHider;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageButton;
+import android.widget.Button;
 
 
 /**
@@ -21,34 +21,19 @@ import android.widget.ImageButton;
  *
  * @see SystemUiHider
  */
-public class Start extends Activity {
-    private Button btn_start;
-    private Button btn_about;
-
+public class About extends Activity {
+    Button btn_return;
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
-        btn_start = (Button) findViewById(R.id.btn_start);
-        btn_about = (Button) findViewById(R.id.btn_about);
-
-        btn_start.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Start.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }
-        );
-
-        btn_about.setOnClickListener(new Button.OnClickListener() {
+        setContentView(R.layout.activity_about);
+        btn_return = (Button) findViewById(R.id.btn_return);
+        btn_return.setOnClickListener(new Button.OnClickListener() {
                                          @Override
                                          public void onClick(View v) {
-                                             Intent intent = new Intent(Start.this, About.class);
-                                             startActivity(intent);
+                                             finish();
                                          }
                                      }
         );

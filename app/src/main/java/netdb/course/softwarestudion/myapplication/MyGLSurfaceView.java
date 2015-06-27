@@ -3,28 +3,33 @@ package netdb.course.softwarestudion.myapplication;
 /**
  * Created by Waiting on 2015/6/25.
  */
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.SensorEvent;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.MotionEvent;
-
-import android.os.SystemClock;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
-import android.util.Log;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 
     private final float TOUCH_SCALE_FACTOR = 180.0f/320;//角度縮放比例
+
+    public int windowSizeX;
+
+    public int windowSizeY;
 
     private final float SECTION_ANGLE = 60f;
 
@@ -39,11 +44,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private float MOVING_RATE;
 
     private SceneRenderer mRenderer;//場景渲染器
-
-
-    private float mPreviousY;//上次的觸控位置Y坐標
-
-    private float mPreviousX;//上次的觸控位置Y坐標
 
     private int lightAngle=90;//燈的當前角度
 
@@ -61,6 +61,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         MOVING_RATE = 4;
 
+
+
+
+
     }
 
 //觸摸事件回調方法
@@ -69,66 +73,64 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     public boolean onTouchEvent(MotionEvent e) {
 
-        float y = e.getY();
+        mRenderer.touchX = e.getX();
 
-        float x = e.getX();
+        mRenderer.touchY = e.getY();
+
+
 
         switch (e.getAction()) {
-
-            /*case MotionEvent.ACTION_MOVE:
-
-                float dy = y - mPreviousY;//計算觸控筆Y位移
-
-                float dx = x - mPreviousX;//計算觸控筆Y位移
-
-                mRenderer.cylinder.mAngleX += dy * TOUCH_SCALE_FACTOR;//設置沿x軸旋轉角度
-
-                mRenderer.cylinder.mAngleZ += dx * TOUCH_SCALE_FACTOR;//設置沿z軸旋轉角度
-            */
             case MotionEvent.ACTION_UP:
                 if(MOVING_CLOCK==0){
-                    Log.d("cycles", Integer.toString(mRenderer.cylinderList.size()) );
                     mRenderer.isTouch=true;
-                    MOVING_CLOCK = BLOCK_LENGTH;
                 }
-
         }
-
         requestRender();
-
-        mPreviousY = y;//記錄觸控筆位置
-
-        mPreviousX = x;//記錄觸控筆位置
-
         return true;
 
     }
 
     public boolean onSensorEvent(SensorEvent e){
-        for(DrawCylinder cylinder:mRenderer.cylinderList){
-            cylinder.mAngleX += e.values[1]*ROTATE_ANGLE;
+        for(int i=0;i<mRenderer.cylinderList.size();i++){
+           // Log.d("cycles", Integer.toString(mRenderer.cylinderList.size())+" "+Integer.toString(mRenderer.blockList.size()) );
+            mRenderer.cylinderList.get(i).mAngleX += e.values[1]*ROTATE_ANGLE;
         }
+        for(int i=0;i<mRenderer.blockList.size();i++){
+          //  Log.d("cycles", Integer.toString(mRenderer.cylinderList.size())+" "+Integer.toString(mRenderer.blockList.size()) );
+            mRenderer.blockList.get(i).mAngleX += e.values[1]*ROTATE_ANGLE;
+        }
+
         requestRender();
         return true;
     }
 
     private class SceneRenderer implements GLSurfaceView.Renderer
     {
+
         int textureId;//紋理名稱ID
         private boolean isTouch;
+        private float touchX,touchY;
         ArrayList<DrawCylinder> cylinderList;
+        ArrayList<DrawWhiteBlock> blockList;
         DrawCylinder cylinder;//創建圓柱體
         DrawCylinder cylinder2;
         public SceneRenderer()
         {
             isTouch=false;
+            blockList=new ArrayList();
+            blockList.add(new DrawWhiteBlock(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE));
+            blockList.add(new DrawWhiteBlock(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE));
+            blockList.add(new DrawWhiteBlock(BLOCK_LENGTH, CYLINDER_RADIUS, SECTION_ANGLE));
+            blockList.get(1).deepX -= BLOCK_LENGTH;
+            blockList.get(2).deepX -= 2*BLOCK_LENGTH;
+
             cylinderList=new ArrayList();
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
             cylinderList.get(1).deepX -= BLOCK_LENGTH;
             cylinderList.get(2).deepX -= 2*BLOCK_LENGTH;
-           // cylinder =new DrawCylinder(BLOCK_LENGTH,20f,60f,2) ;//創建圓柱體 length, circle_radius, degreespan, textureId
+
         }
 
         public void onDrawFrame(GL10 gl) {
@@ -165,42 +167,48 @@ public class MyGLSurfaceView extends GLSurfaceView {
             gl.glRotatef(-45, 0, 1, 0);//旋轉
 
             initLight(gl);//開燈
+
+            for(int i=0;i<cylinderList.size();i++){
+
+                autoGenerateBlock(gl,cylinderList.get(i),blockList.get(i));
+               // Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
+            }
             if(isTouch){
-                cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
-                cylinderList.get(cylinderList.size()-1).deepX -= 3*BLOCK_LENGTH;
-                cylinderList.get(cylinderList.size()-1).mAngleX = cylinderList.get(cylinderList.size()-2).mAngleX;
+
+                ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(4);
+                PixelBuffer.order(ByteOrder.nativeOrder());
+                PixelBuffer.position(0);
+                int mTemp = 0;
+                System.out.println(touchY);
+                gl.glReadPixels(Math.round(touchX), windowSizeY-Math.round(touchY), 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, PixelBuffer);
+                // Log.e("Picking", " xy: x" + x + " y"+ y);
+                byte b [] = new byte[4];
+                PixelBuffer.get(b);
+                Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
+                        PixelBuffer.get(2) + " a" + PixelBuffer.get(3));
+                if(PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 ){
+                    MOVING_CLOCK = BLOCK_LENGTH;
+                    cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
+                    cylinderList.get(cylinderList.size()-1).deepX -= 3*BLOCK_LENGTH;
+                    cylinderList.get(cylinderList.size()-1).mAngleX = cylinderList.get(cylinderList.size()-2).mAngleX;
+
+                    blockList.add(new DrawWhiteBlock(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE));
+                    blockList.get(blockList.size()-1).deepX -= 3*BLOCK_LENGTH;
+                    blockList.get(blockList.size()-1).mAngleX = blockList.get(blockList.size()-2).mAngleX;
+                }
                 isTouch=false;
             }
             if(MOVING_CLOCK!=0){
-                for(DrawCylinder cylinder:mRenderer.cylinderList){
-                    cylinder.deepX += MOVING_RATE;
+                for(int i=0;i<cylinderList.size();i++){
+                    cylinderList.get(i).deepX += MOVING_RATE;
+                    blockList.get(i).deepX+=MOVING_RATE;
                 }
                 MOVING_CLOCK -= MOVING_RATE;
             }
-
-
-            for(int i=0;i<cylinderList.size();i++){
-                autoGenerateBlock(gl,cylinderList.get(i));
-                Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
-            }
-          //  cylinder.drawSelf(gl);//繪製
-
-
-          //  gl.glTranslatef(-BLOCK_LENGTH-1, 0, 0);
-           // cylinder2.drawSelf(gl);
-           // cylinder.drawSelf(gl);
-
-
-
-
-
-
             //closeLight(gl);//關燈
-
             gl.glPopMatrix();//恢復變換矩陣現場
 
         }
-
         public void onSurfaceChanged(GL10 gl, int width, int height) {
 
         //設置視窗大小及位置
@@ -273,10 +281,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     }
 
-    public void autoGenerateBlock(GL10 gl,DrawCylinder cylinder){
+    public void autoGenerateBlock(GL10 gl,DrawCylinder cylinder,DrawWhiteBlock block){
         gl.glPushMatrix();
         cylinder.drawSelf(gl);
         gl.glPopMatrix();
+        gl.glPushMatrix();
+        block.drawSelf(gl);
+        gl.glPopMatrix();
+
     }
 
  //初始化白色燈
@@ -291,7 +303,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     //環境光設置
 
-        float[] ambientParams={0.2f,0.2f,0.2f,1.0f};//光參數 RGBA
+        float[] ambientParams={0.27f,0.963f,0.953f,1.0f};//光參數 RGBA
 
         gl.glLightfv(GL10.GL_LIGHT1, GL10.GL_AMBIENT, ambientParams,0);
 
@@ -329,13 +341,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     //環境光
 
-        float ambientMaterial[] = {248f/255f, 242f/255f, 144f/255f, 1.0f};
+        float ambientMaterial[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
         gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, ambientMaterial,0);
 
     //散射光
 
-        float diffuseMaterial[] = {248f/255f, 242f/255f, 144f/255f, 1.0f};
+        float diffuseMaterial[] = {1f, 1f, 1f, 1.0f};
 
         gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, diffuseMaterial,0);
 

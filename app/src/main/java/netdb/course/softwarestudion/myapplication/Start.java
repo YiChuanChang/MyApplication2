@@ -10,6 +10,8 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 
 
@@ -21,7 +23,11 @@ import android.widget.ImageButton;
  */
 public class Start extends Activity {
     private Button btn_start;
+
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         btn_start = (Button) findViewById(R.id.btn_start);

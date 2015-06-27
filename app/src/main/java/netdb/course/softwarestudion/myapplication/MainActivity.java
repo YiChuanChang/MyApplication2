@@ -53,7 +53,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             mgr  = (SensorManager) this.getSystemService(SENSOR_SERVICE);
 
-            gyro = mgr.getDefaultSensor(Sensor.TYPE_GYROSCOPE);//取得陀螺儀的偵測
+            gyro = mgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);//取得陀螺儀的偵測
 
         }
 

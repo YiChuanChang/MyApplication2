@@ -33,7 +33,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     private final float SECTION_ANGLE = 60f;
 
-    private final float ROTATE_ANGLE = 5f;
+    private final float ROTATE_ANGLE = 3f;
 
     private final float BLOCK_LENGTH = 20f;
 
@@ -91,14 +91,17 @@ public class MyGLSurfaceView extends GLSurfaceView {
     }
 
     public boolean onSensorEvent(SensorEvent e){
-        for(int i=0;i<mRenderer.cylinderList.size();i++){
-           // Log.d("cycles", Integer.toString(mRenderer.cylinderList.size())+" "+Integer.toString(mRenderer.blockList.size()) );
-            mRenderer.cylinderList.get(i).mAngleX += e.values[1]*ROTATE_ANGLE;
+        if(e.values[0]>0.5 || e.values[0]<-0.5){
+            for(int i=0;i<mRenderer.cylinderList.size();i++){
+                // Log.d("cycles", Integer.toString(mRenderer.cylinderList.size())+" "+Integer.toString(mRenderer.blockList.size()) );
+                mRenderer.cylinderList.get(i).mAngleX += e.values[0]*ROTATE_ANGLE;
+            }
+            for(int i=0;i<mRenderer.blockList.size();i++){
+                //  Log.d("cycles", Integer.toString(mRenderer.cylinderList.size())+" "+Integer.toString(mRenderer.blockList.size()) );
+                mRenderer.blockList.get(i).mAngleX += e.values[0]*ROTATE_ANGLE;
+            }
         }
-        for(int i=0;i<mRenderer.blockList.size();i++){
-          //  Log.d("cycles", Integer.toString(mRenderer.cylinderList.size())+" "+Integer.toString(mRenderer.blockList.size()) );
-            mRenderer.blockList.get(i).mAngleX += e.values[1]*ROTATE_ANGLE;
-        }
+
 
         requestRender();
         return true;

@@ -24,10 +24,10 @@ public class Square {
     };
 
     // 將顏色資訊對應到點陣列上
-    float[] colors = { 0f, 0f, 0f, 1f, // 左上角 0 red
-            0f, 0f, 0f, 1f, // 左下角 1 green
-            0f, 0f, 0f, 1f, // 右下角 2 blue
-            0f, 0f, 0f, 1f, // 右上角 3 magenta
+    float[] colors = { 0f, 0f, 1f, 1f, // 左上角 0 red
+            0f, 0f, 1f, 1f, // 左下角 1 green
+            0f, 0f, 1f, 1f, // 右下角 2 blue
+            0f, 0f, 1f, 1f, // 右上角 3 magenta
     };
 
     // 質地坐標
@@ -145,7 +145,8 @@ public class Square {
         gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
         // 除能質地的使用
-        gl.glDisable(GL10.GL_TEXTURE_2D); }
+        gl.glDisable(GL10.GL_TEXTURE_2D);
+    }
 
     public void setBitmap(Bitmap bitmap) {
         // TODO Auto-generated method stub

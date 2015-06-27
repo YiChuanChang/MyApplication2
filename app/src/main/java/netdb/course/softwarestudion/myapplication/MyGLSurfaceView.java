@@ -5,26 +5,32 @@ package netdb.course.softwarestudion.myapplication;
  */
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.hardware.SensorEvent;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
-import android.util.Log;
+import android.os.Message;
 import android.view.MotionEvent;
-
+import android.os.Handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11 ;       private SharedPreferences settingsActivity;
+import javax.microedition.khronos.opengles.GL11;
 
-      private MainActivity mainActivity;
+public class MyGLSurfaceView extends GLSurfaceView {
+
+        private SharedPreferences settingsActivity;
+
+      private Handler handler;
 
         public Timer timer;
 
@@ -63,11 +69,11 @@ import javax.microedition.khronos.opengles.GL11 ;       private SharedPreference
         Bitmap map0p, map1p, map2p, map3p, map4p, map5p, map6p, map7p, map8p, map9p;
 
 
-        public MyGLSurfaceView(Context context, SharedPreferences settingsActivity,MainActivity mainActivity) {
+        public MyGLSurfaceView(Context context, SharedPreferences settingsActivity,Handler handler) {
 
                 super(context);
 
-                this.mainActivity=mainActivity;
+                this.handler=handler;
 
                 this.settingsActivity=settingsActivity;
 
@@ -156,7 +162,7 @@ import javax.microedition.khronos.opengles.GL11 ;       private SharedPreference
 
     private class SceneRenderer implements GLSurfaceView.Renderer
     {
-
+        int score=0;
         int textureId;//紋理名稱ID
         private boolean isTouch;
         private float touchX,touchY;
@@ -185,17 +191,19 @@ import javax.microedition.khronos.opengles.GL11 ;       private SharedPreference
             time_square         = new Square();
             time_square_ten     = new Square();
             time_square_point   = new Square();
+
         }
 
         public void onDrawFrame(GL10 gl) {
-            if(timeCount<=0){
+            if(COUNT_DOWN-timeCount<=0  ){
                 int highScore=settingsActivity.getInt("HighScore",0);
                 if(score>highScore){
                     SharedPreferences.Editor editor =settingsActivity.edit();
                     editor.putInt("HighScore", score);
                     editor.commit();
                 }
-                mainActivity.onGameOver();
+                handler.sendMessage(Message.obtain(handler, 0));
+
 
             }
         //清除顏色緩存
@@ -232,6 +240,14 @@ import javax.microedition.khronos.opengles.GL11 ;       private SharedPreference
 
             initLight(gl);//開燈
 
+
+
+            for(int i=0;i<cylinderList.size();i++){
+
+                autoGenerateBlock(gl,cylinderList.get(i),blockList.get(i));
+               // Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
+            }
+
             gl.glPushMatrix();
             gl.glTranslatef(-BLOCK_LENGTH, 0, 0);
 
@@ -243,12 +259,6 @@ import javax.microedition.khronos.opengles.GL11 ;       private SharedPreference
             gl.glTranslatef(0 , 2f, 0);
             time_square_point.draw(gl);
             gl.glPopMatrix();
-
-            for(int i=0;i<cylinderList.size();i++){
-
-                autoGenerateBlock(gl,cylinderList.get(i),blockList.get(i));
-               // Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
-            }
             if(isTouch){
 
                 ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(4);
@@ -275,10 +285,12 @@ import javax.microedition.khronos.opengles.GL11 ;       private SharedPreference
                 }
                 else{
                     if(timer!=null && !timer.isInterrupted()){
+
                         timer.stopThread();
                         timer.interrupt();
                         System.out.println(timeCount);
                     }
+                    handler.sendMessage(Message.obtain(handler, 0));
                 }
                 isTouch=false;
             }
@@ -365,11 +377,11 @@ import javax.microedition.khronos.opengles.GL11 ;       private SharedPreference
    }
         private void set_square(){
 
-            Log.d("timeCount", Float.toString(timeCount));
+           /* Log.d("timeCount", Float.toString(timeCount));
             Log.d("timeCount_ten", Integer.toString((int)timeCount/10));
             Log.d("timeCount", Integer.toString((int)timeCount%10));
             Log.d("timeCount_ten", Integer.toString((int)(timeCount*10)%10));
-
+*/
             //ten
             switch((int)(COUNT_DOWN-timeCount)/10){
                 case 0:  time_square_ten.setBitmap(map0);break;

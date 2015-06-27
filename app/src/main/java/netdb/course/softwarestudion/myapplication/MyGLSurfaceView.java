@@ -7,6 +7,10 @@ package netdb.course.softwarestudion.myapplication;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.hardware.SensorEvent;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
@@ -21,11 +25,6 @@ import java.util.ArrayList;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
-
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 
@@ -205,26 +204,36 @@ public class MyGLSurfaceView extends GLSurfaceView {
             gl.glRotatef(-45, 0, 1, 0);//旋轉
 
             initLight(gl);//開燈
+            if(cylinderList.size()>5){
+                cylinderList.remove(0);
+                blockList.remove(0);
+            }
 
             for(int i=0;i<cylinderList.size();i++){
-
                 autoGenerateBlock(gl,cylinderList.get(i),blockList.get(i));
                // Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
             }
             if(isTouch){
+                boolean isBlack=true;
 
-                ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(4);
+                ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(256);
                 PixelBuffer.order(ByteOrder.nativeOrder());
                 PixelBuffer.position(0);
-                int mTemp = 0;
-               // System.out.println(touchY);
-                gl.glReadPixels(Math.round(touchX), windowSizeY-Math.round(touchY), 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, PixelBuffer);
-                // Log.e("Picking", " xy: x" + x + " y"+ y);
-                byte b [] = new byte[4];
+                gl.glReadPixels(Math.round(touchX)-4, windowSizeY-Math.round(touchY)-4,8,8, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, PixelBuffer);
+                byte b [] = new byte[256];
                 PixelBuffer.get(b);
-               /* Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
-                        PixelBuffer.get(2) + " a" + PixelBuffer.get(3));*/
-                if(PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 ){
+
+                for(int i=0;i<b.length;i++){
+                    if(i%4==3){
+                        i++;
+                        if(i==b.length) break;
+                    }
+                    if(b[i]!=0){
+                        isBlack=false;
+                        break;
+                    }
+                }
+                if(!isBlack){
                     MOVING_CLOCK = BLOCK_LENGTH;
                     cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
                     cylinderList.get(cylinderList.size()-1).deepX -= 3*BLOCK_LENGTH;
@@ -236,7 +245,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 }
                 else{
                     if(timer!=null && !timer.isInterrupted()){
-                        timer.stopThread();
+                     //   timer.stopThread();
                         timer.interrupt();
                         System.out.println(timeCount);
                     }
@@ -252,7 +261,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
             }
             //closeLight(gl);//關燈
             gl.glPopMatrix();//恢復變換矩陣現場
-            initFontBitmap();
+           // initFontBitmap();
 
         }
         public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -280,7 +289,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         }
 
    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            initFontBitmap();
+           // initFontBitmap();
         //關閉抗抖動
 
             gl.glDisable(GL10.GL_DITHER);
@@ -301,13 +310,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
             gl.glEnable(GL10.GL_DEPTH_TEST);
 
-            textureId=initTexture(gl,R.drawable.as);//紋理ID
+           // textureId=initTexture(gl,R.drawable.as);//紋理ID
 
 
 
         // //開啟一個線程自動旋轉光源
 
-             new Thread(){
+       /*      new Thread(){
                  public void run(){
                     while(true){
                           lightAngle+=5;//轉動燈
@@ -321,7 +330,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                           }
                       }
                   }
-              }.start();
+              }.start();*/
 
    }
 

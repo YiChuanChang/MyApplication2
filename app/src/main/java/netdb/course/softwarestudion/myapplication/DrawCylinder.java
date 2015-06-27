@@ -161,7 +161,7 @@ public class DrawCylinder
 
         gl.glVertexPointer(3, GL10.GL_FLOAT, 0, myVertexBuffer);//指定頂點緩衝
 
-     //   gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);//打開法向量緩衝
+      //  gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);//打開法向量緩衝
 
       //  gl.glNormalPointer(GL10.GL_FLOAT, 0, myNormalBuffer);//指定法向量緩衝
 

@@ -7,10 +7,6 @@ package netdb.course.softwarestudion.myapplication;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.hardware.SensorEvent;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
@@ -26,6 +22,16 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+
+import android.text.TextPaint;
+import android.text.StaticLayout;
+import android.text.Layout.Alignment;
+import android.util.Log;
+
 public class MyGLSurfaceView extends GLSurfaceView {
 
         public Timer timer;
@@ -40,44 +46,53 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         public int windowSizeY;
 
-    private final float ROTATE_ANGLE = 3f;
+        private final float ROTATE_ANGLE = 3f;
 
-    private final float SECTION_ANGLE = 45f;
+        private final float SECTION_ANGLE = 45f;
 
-    private final float BLOCK_LENGTH = 20f;
+        private final float BLOCK_LENGTH = 20f;
 
-    private final float CYLINDER_RADIUS = 15f;
+        private final float CYLINDER_RADIUS = 15f;
 
-    private float MOVING_CLOCK;
+        private float MOVING_CLOCK;
 
-    private float MOVING_RATE;
+        private float MOVING_RATE;
 
-    private SceneRenderer mRenderer;//場景渲染器
+        private SceneRenderer mRenderer;//場景渲染器
 
-    private int lightAngle=90;//燈的當前角度
+        private int lightAngle=90;//燈的當前角度
 
-    public MyGLSurfaceView(Context context) {
+        private static Canvas canvas;
 
-        super(context);
+        Bitmap map0,  map1,  map2,  map3,  map4,  map5,  map6,  map7,  map8,  map9;
 
-        mRenderer = new SceneRenderer(); //創建場景渲染器
-
-        setRenderer(mRenderer); //設置渲染器
-
-        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//設置渲染模式為主動渲染
-
-        MOVING_CLOCK = 0;
-
-        MOVING_RATE = 4;
-
-        timeCount=0.0f;
-
-        timer =new Timer();
-
-        ifTimerStart = false;
+        Bitmap map0p, map1p, map2p, map3p, map4p, map5p, map6p, map7p, map8p, map9p;
 
 
-    }
+        public MyGLSurfaceView(Context context) {
+
+                super(context);
+
+                mRenderer = new SceneRenderer(); //創建場景渲染器
+
+                setRenderer(mRenderer); //設置渲染器
+
+                setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//設置渲染模式為主動渲染
+
+                MOVING_CLOCK = 0;
+
+                MOVING_RATE = 4;
+
+                timeCount=0.0f;
+
+                timer =new Timer();
+
+                ifTimerStart = false;
+
+                canvas = new Canvas();
+
+                read_bitmap();
+        }
 
 //觸摸事件回調方法
 
@@ -149,6 +164,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
         private float touchX,touchY;
         ArrayList<DrawCylinder> cylinderList;
         ArrayList<DrawWhiteBlock> blockList;
+        Square time_square_ten;
+        Square time_square;
+        Square time_square_point;
         public SceneRenderer()
         {
             isTouch=false;
@@ -166,11 +184,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
             cylinderList.get(1).deepX -= BLOCK_LENGTH;
             cylinderList.get(2).deepX -= 2*BLOCK_LENGTH;
 
+            time_square         = new Square();
+            time_square_ten     = new Square();
+            time_square_point   = new Square();
         }
 
         public void onDrawFrame(GL10 gl) {
-
-
         //清除顏色緩存
 
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
@@ -204,36 +223,38 @@ public class MyGLSurfaceView extends GLSurfaceView {
             gl.glRotatef(-45, 0, 1, 0);//旋轉
 
             initLight(gl);//開燈
-            if(cylinderList.size()>5){
-                cylinderList.remove(0);
-                blockList.remove(0);
-            }
+
+            gl.glPushMatrix();
+            gl.glTranslatef(-BLOCK_LENGTH, 0, 0);
+
+            set_square();
+            gl.glTranslatef(0, -0.5f, 1.1f);
+            time_square.draw(gl);
+            gl.glTranslatef(0,   -1f, 0);
+            time_square_ten.draw(gl);
+            gl.glTranslatef(0 , 2f, 0);
+            time_square_point.draw(gl);
+            gl.glPopMatrix();
 
             for(int i=0;i<cylinderList.size();i++){
+
                 autoGenerateBlock(gl,cylinderList.get(i),blockList.get(i));
                // Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
             }
             if(isTouch){
-                boolean isBlack=true;
 
-                ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(256);
+                ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(4);
                 PixelBuffer.order(ByteOrder.nativeOrder());
                 PixelBuffer.position(0);
-                gl.glReadPixels(Math.round(touchX)-4, windowSizeY-Math.round(touchY)-4,8,8, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, PixelBuffer);
-                byte b [] = new byte[256];
+                int mTemp = 0;
+               // System.out.println(touchY);
+                gl.glReadPixels(Math.round(touchX), windowSizeY-Math.round(touchY), 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, PixelBuffer);
+                // Log.e("Picking", " xy: x" + x + " y"+ y);
+                byte b [] = new byte[4];
                 PixelBuffer.get(b);
-
-                for(int i=0;i<b.length;i++){
-                    if(i%4==3){
-                        i++;
-                        if(i==b.length) break;
-                    }
-                    if(b[i]!=0){
-                        isBlack=false;
-                        break;
-                    }
-                }
-                if(!isBlack){
+               /* Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
+                        PixelBuffer.get(2) + " a" + PixelBuffer.get(3));*/
+                if(PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 ){
                     MOVING_CLOCK = BLOCK_LENGTH;
                     cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
                     cylinderList.get(cylinderList.size()-1).deepX -= 3*BLOCK_LENGTH;
@@ -245,7 +266,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 }
                 else{
                     if(timer!=null && !timer.isInterrupted()){
-                     //   timer.stopThread();
+                        timer.stopThread();
                         timer.interrupt();
                         System.out.println(timeCount);
                     }
@@ -261,7 +282,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
             }
             //closeLight(gl);//關燈
             gl.glPopMatrix();//恢復變換矩陣現場
-           // initFontBitmap();
+
 
         }
         public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -289,7 +310,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         }
 
    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-           // initFontBitmap();
+
         //關閉抗抖動
 
             gl.glDisable(GL10.GL_DITHER);
@@ -310,29 +331,77 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
             gl.glEnable(GL10.GL_DEPTH_TEST);
 
-           // textureId=initTexture(gl,R.drawable.as);//紋理ID
+            //textureId=initTexture(gl,R.drawable.as);//紋理ID
 
 
 
         // //開啟一個線程自動旋轉光源
 
-       /*      new Thread(){
+             new Thread(){
                  public void run(){
                     while(true){
                           lightAngle+=5;//轉動燈
                           //mRenderer.cylinder.mAngleY+=2*TOUCH_SCALE_FACTOR;//球沿Y軸轉動
                           requestRender();//重繪畫面
                           try  {
-                          Thread.sleep(500);//休息10ms再重繪
+                          Thread.sleep(50);//休息10ms再重繪
                           }
                           catch(Exception e)  {
                           e.printStackTrace();
                           }
                       }
                   }
-              }.start();*/
+              }.start();
 
    }
+        private void set_square(){
+
+            Log.d("timeCount", Float.toString(timeCount));
+            Log.d("timeCount_ten", Integer.toString((int)timeCount/10));
+            Log.d("timeCount", Integer.toString((int)timeCount%10));
+            Log.d("timeCount_ten", Integer.toString((int)(timeCount*10)%10));
+
+            //ten
+            switch((int)timeCount/10){
+                case 0:  time_square_ten.setBitmap(map0);break;
+                case 1:  time_square_ten.setBitmap(map1);break;
+                case 2:  time_square_ten.setBitmap(map2);break;
+                case 3:  time_square_ten.setBitmap(map3);break;
+                case 4:  time_square_ten.setBitmap(map4);break;
+                case 5:  time_square_ten.setBitmap(map5);break;
+                case 6:  time_square_ten.setBitmap(map6);break;
+                case 7:  time_square_ten.setBitmap(map7);break;
+                case 8:  time_square_ten.setBitmap(map8);break;
+                case 9:  time_square_ten.setBitmap(map9);break;
+            }
+            //
+            switch((int)timeCount%10){
+                case 0:  time_square.setBitmap(map0);break;
+                case 1:  time_square.setBitmap(map1);break;
+                case 2:  time_square.setBitmap(map2);break;
+                case 3:  time_square.setBitmap(map3);break;
+                case 4:  time_square.setBitmap(map4);break;
+                case 5:  time_square.setBitmap(map5);break;
+                case 6:  time_square.setBitmap(map6);break;
+                case 7:  time_square.setBitmap(map7);break;
+                case 8:  time_square.setBitmap(map8);break;
+                case 9:  time_square.setBitmap(map9);break;
+            }
+            //point
+            switch((int)(timeCount*10)%10){
+                case 0:  time_square_point.setBitmap(map0p);break;
+                case 1:  time_square_point.setBitmap(map1p);break;
+                case 2:  time_square_point.setBitmap(map2p);break;
+                case 3:  time_square_point.setBitmap(map3p);break;
+                case 4:  time_square_point.setBitmap(map4p);break;
+                case 5:  time_square_point.setBitmap(map5p);break;
+                case 6:  time_square_point.setBitmap(map6p);break;
+                case 7:  time_square_point.setBitmap(map7p);break;
+                case 8:  time_square_point.setBitmap(map8p);break;
+                case 9:  time_square_point.setBitmap(map9p);break;
+            }
+
+        }
 
     }
 
@@ -464,19 +533,49 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     }
 
-    public void initFontBitmap(){
-        String font = timer.toString();
-        Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);          //背景颜色
-        canvas.drawColor(Color.LTGRAY);
-        Paint p = new Paint();          //字体设置
-        String fontType = "TimeNews";
-        Typeface typeface = Typeface.create(fontType, Typeface.BOLD);          //消除锯齿
-        p.setAntiAlias(true);          //字体为红色
-        p.setColor(Color.RED);          p.setTypeface(typeface);
-        p.setTextSize(28);          //绘制字体
-        canvas.drawText(font, 0, 100, p);
+    private void read_bitmap(){
+         map1 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a1);
+         map2 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a2);
+         map3 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a3);
+         map4 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a4);
+         map5 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a5);
+         map6 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a6);
+         map7 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a7);
+         map8 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a8);
+         map9 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a9);
+         map0 = BitmapFactory.decodeResource(getResources(),
+                R.drawable.a0);
+        map1p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point1);
+        map2p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point2);
+        map3p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point3);
+        map4p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point4);
+        map5p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point5);
+        map6p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point6);
+        map7p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point7);
+        map8p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point8);
+        map9p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point9);
+        map0p = BitmapFactory.decodeResource(getResources(),
+                R.drawable.point0);
     }
+
 
 
 }

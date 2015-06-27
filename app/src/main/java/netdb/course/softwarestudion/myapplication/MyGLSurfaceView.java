@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.hardware.SensorEvent;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import java.io.IOException;
@@ -25,61 +24,80 @@ import javax.microedition.khronos.opengles.GL11;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    private final float TOUCH_SCALE_FACTOR = 180.0f/320;//角度縮放比例
+        Timer timer;
+        private final float TOUCH_SCALE_FACTOR = 180.0f/320;//角度縮放比例
 
-    public int windowSizeX;
+        public int windowSizeX;
 
-    public int windowSizeY;
+        public float timeCount;
 
-    private final float SECTION_ANGLE = 60f;
+        public int windowSizeY;
 
-    private final float ROTATE_ANGLE = 5f;
+        private final float SECTION_ANGLE = 60f;
 
-    private final float BLOCK_LENGTH = 20f;
+        private final float ROTATE_ANGLE = 5f;
 
-    private final float CYLINDER_RADIUS = 15f;
+        private final float BLOCK_LENGTH = 20f;
 
-    private float MOVING_CLOCK;
+        private final float CYLINDER_RADIUS = 15f;
 
-    private float MOVING_RATE;
+        private float MOVING_CLOCK;
 
-    private SceneRenderer mRenderer;//場景渲染器
+        private float MOVING_RATE;
 
-    private int lightAngle=90;//燈的當前角度
+        private SceneRenderer mRenderer;//場景渲染器
 
-    public MyGLSurfaceView(Context context) {
+        private int lightAngle=90;//燈的當前角度
 
-        super(context);
+        public MyGLSurfaceView(Context context) {
 
-        mRenderer = new SceneRenderer(); //創建場景渲染器
+            super(context);
 
-        setRenderer(mRenderer); //設置渲染器
+            mRenderer = new SceneRenderer(); //創建場景渲染器
 
-        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//設置渲染模式為主動渲染
+            setRenderer(mRenderer); //設置渲染器
 
-        MOVING_CLOCK = 0;
+            setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//設置渲染模式為主動渲染
 
-        MOVING_RATE = 4;
+            MOVING_CLOCK = 0;
 
+            MOVING_RATE = 4;
 
+            timeCount=0.0f;
 
-
-
-    }
+        }
 
 //觸摸事件回調方法
 
-    @Override
 
-    public boolean onTouchEvent(MotionEvent e) {
+    private class Timer extends Thread{
+        private boolean isRunning = true;
 
-        mRenderer.touchX = e.getX();
+        public void run(){
+            super.run();
+            while(isRunning){
+                timeCount+=0.1f;
+                try  {
+                    Thread.sleep(100);//休息10ms再重繪
+                }
+                catch(Exception e)  {
+                    e.printStackTrace();
+                }
+            }
+        }
+        public void stopThread()
+        {
+            this.isRunning = false;
+        }
 
-        mRenderer.touchY = e.getY();
+    }
+        @Override
 
+        public boolean onTouchEvent(MotionEvent e) {
 
-
-        switch (e.getAction()) {
+            mRenderer.touchX = e.getX();
+            mRenderer.touchY = e.getY();
+            switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
                 if(MOVING_CLOCK==0){
                     mRenderer.isTouch=true;
@@ -112,8 +130,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
         private float touchX,touchY;
         ArrayList<DrawCylinder> cylinderList;
         ArrayList<DrawWhiteBlock> blockList;
-        DrawCylinder cylinder;//創建圓柱體
-        DrawCylinder cylinder2;
         public SceneRenderer()
         {
             isTouch=false;
@@ -179,13 +195,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 PixelBuffer.order(ByteOrder.nativeOrder());
                 PixelBuffer.position(0);
                 int mTemp = 0;
-                System.out.println(touchY);
+               // System.out.println(touchY);
                 gl.glReadPixels(Math.round(touchX), windowSizeY-Math.round(touchY), 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, PixelBuffer);
                 // Log.e("Picking", " xy: x" + x + " y"+ y);
                 byte b [] = new byte[4];
                 PixelBuffer.get(b);
-                Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
-                        PixelBuffer.get(2) + " a" + PixelBuffer.get(3));
+               /* Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
+                        PixelBuffer.get(2) + " a" + PixelBuffer.get(3));*/
                 if(PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 ){
                     MOVING_CLOCK = BLOCK_LENGTH;
                     cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
@@ -195,6 +211,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
                     blockList.add(new DrawWhiteBlock(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE));
                     blockList.get(blockList.size()-1).deepX -= 3*BLOCK_LENGTH;
                     blockList.get(blockList.size()-1).mAngleX = blockList.get(blockList.size()-2).mAngleX;
+                }
+                else{
+                    if(timer!=null && !timer.isInterrupted()){
+                        timer.stopThread();
+                        timer.interrupt();
+                        System.out.println(timeCount);
+                    }
                 }
                 isTouch=false;
             }
@@ -277,7 +300,11 @@ public class MyGLSurfaceView extends GLSurfaceView {
                   }
               }.start();
 
-        }
+       timer =new Timer();
+       timer.start();
+
+
+   }
 
     }
 

@@ -58,7 +58,7 @@ public class DrawWhiteBlock {
 
         int index=random.nextInt(spannum);
 
-        float circle_degree=360.0f-index*60;
+        float circle_degree=360.0f-index*degreespan;
 
         float x1 = (-length);
 

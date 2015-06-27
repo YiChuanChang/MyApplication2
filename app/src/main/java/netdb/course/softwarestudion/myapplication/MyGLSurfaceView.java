@@ -5,35 +5,32 @@ package netdb.course.softwarestudion.myapplication;
  */
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.hardware.SensorEvent;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.os.Message;
 import android.view.MotionEvent;
-
+import android.os.Handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-
-import android.text.TextPaint;
-import android.text.StaticLayout;
-import android.text.Layout.Alignment;
-import android.util.Log;
-
 public class MyGLSurfaceView extends GLSurfaceView {
+
+        private SharedPreferences settingsActivity;
+
+      private Handler handler;
 
         public Timer timer;
 
@@ -72,9 +69,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
         Bitmap map0p, map1p, map2p, map3p, map4p, map5p, map6p, map7p, map8p, map9p;
 
 
-        public MyGLSurfaceView(Context context) {
+        public MyGLSurfaceView(Context context, SharedPreferences settingsActivity,Handler handler) {
 
                 super(context);
+
+                this.handler=handler;
+
+                this.settingsActivity=settingsActivity;
 
                 mRenderer = new SceneRenderer(); //創建場景渲染器
 
@@ -161,7 +162,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     private class SceneRenderer implements GLSurfaceView.Renderer
     {
-
+        int score=0;
         int textureId;//紋理名稱ID
         private boolean isTouch;
         private float touchX,touchY;
@@ -190,9 +191,21 @@ public class MyGLSurfaceView extends GLSurfaceView {
             time_square         = new Square();
             time_square_ten     = new Square();
             time_square_point   = new Square();
+
         }
 
         public void onDrawFrame(GL10 gl) {
+            if(COUNT_DOWN-timeCount<=0  ){
+                int highScore=settingsActivity.getInt("HighScore",0);
+                if(score>highScore){
+                    SharedPreferences.Editor editor =settingsActivity.edit();
+                    editor.putInt("HighScore", score);
+                    editor.commit();
+                }
+                handler.sendMessage(Message.obtain(handler, 0));
+
+
+            }
         //清除顏色緩存
 
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
@@ -228,13 +241,16 @@ public class MyGLSurfaceView extends GLSurfaceView {
             initLight(gl);//開燈
 
 
+
             for(int i=0;i<cylinderList.size();i++){
 
                 autoGenerateBlock(gl,cylinderList.get(i),blockList.get(i));
-                // Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
+               // Log.d(i+"=", Float.toString(cylinderList.get(i).deepX));
             }
+
             gl.glPushMatrix();
             gl.glTranslatef(-BLOCK_LENGTH, 0, 0);
+
             set_square();
             gl.glTranslatef(0, -0.5f, 1.1f);
             time_square.draw(gl);
@@ -243,8 +259,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
             gl.glTranslatef(0 , 2f, 0);
             time_square_point.draw(gl);
             gl.glPopMatrix();
-
-
             if(isTouch){
 
                 ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(4);
@@ -259,6 +273,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                /* Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
                         PixelBuffer.get(2) + " a" + PixelBuffer.get(3));*/
                 if(PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 ){
+                    score++;
                     MOVING_CLOCK = BLOCK_LENGTH;
                     cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
                     cylinderList.get(cylinderList.size()-1).deepX -= 3*BLOCK_LENGTH;
@@ -270,11 +285,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 }
                 else{
                     if(timer!=null && !timer.isInterrupted()){
+
                         timer.stopThread();
                         timer.interrupt();
                         System.out.println(timeCount);
-
                     }
+                    handler.sendMessage(Message.obtain(handler, 0));
                 }
                 isTouch=false;
             }
@@ -361,11 +377,11 @@ public class MyGLSurfaceView extends GLSurfaceView {
    }
         private void set_square(){
 
-            Log.d("timeCount", Float.toString(timeCount));
+           /* Log.d("timeCount", Float.toString(timeCount));
             Log.d("timeCount_ten", Integer.toString((int)timeCount/10));
             Log.d("timeCount", Integer.toString((int)timeCount%10));
             Log.d("timeCount_ten", Integer.toString((int)(timeCount*10)%10));
-
+*/
             //ten
             switch((int)(COUNT_DOWN-timeCount)/10){
                 case 0:  time_square_ten.setBitmap(map0);break;

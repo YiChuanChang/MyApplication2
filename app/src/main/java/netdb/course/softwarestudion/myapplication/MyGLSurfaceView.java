@@ -5,7 +5,6 @@ package netdb.course.softwarestudion.myapplication;
  */
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,11 +22,7 @@ import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
-
-public class MyGLSurfaceView extends GLSurfaceView {
-
-        private SharedPreferences settingsActivity;
+import javax.microedition.khronos.opengles.GL11 ;       private SharedPreferences settingsActivity;
 
       private MainActivity mainActivity;
 
@@ -50,6 +45,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
         private final float BLOCK_LENGTH = 20f;
 
         private final float CYLINDER_RADIUS = 15f;
+
+        private final float COUNT_DOWN = 25F;
 
         private float MOVING_CLOCK;
 
@@ -162,7 +159,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         int textureId;//紋理名稱ID
         private boolean isTouch;
-        int score=0;
         private float touchX,touchY;
         ArrayList<DrawCylinder> cylinderList;
         ArrayList<DrawWhiteBlock> blockList;
@@ -375,7 +371,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
             Log.d("timeCount_ten", Integer.toString((int)(timeCount*10)%10));
 
             //ten
-            switch((int)timeCount/10){
+            switch((int)(COUNT_DOWN-timeCount)/10){
                 case 0:  time_square_ten.setBitmap(map0);break;
                 case 1:  time_square_ten.setBitmap(map1);break;
                 case 2:  time_square_ten.setBitmap(map2);break;
@@ -388,7 +384,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 case 9:  time_square_ten.setBitmap(map9);break;
             }
             //
-            switch((int)timeCount%10){
+            switch((int)(COUNT_DOWN-timeCount)%10){
                 case 0:  time_square.setBitmap(map0);break;
                 case 1:  time_square.setBitmap(map1);break;
                 case 2:  time_square.setBitmap(map2);break;
@@ -401,7 +397,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 case 9:  time_square.setBitmap(map9);break;
             }
             //point
-            switch((int)(timeCount*10)%10){
+            switch((int)((COUNT_DOWN-timeCount)*10)%10){
                 case 0:  time_square_point.setBitmap(map0p);break;
                 case 1:  time_square_point.setBitmap(map1p);break;
                 case 2:  time_square_point.setBitmap(map2p);break;
@@ -548,45 +544,45 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     private void read_bitmap(){
          map1 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a1);
+                R.drawable.b1);
          map2 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a2);
+                R.drawable.b2);
          map3 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a3);
+                R.drawable.b3);
          map4 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a4);
+                R.drawable.b4);
          map5 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a5);
+                R.drawable.b5);
          map6 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a6);
+                R.drawable.b6);
          map7 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a7);
+                R.drawable.b7);
          map8 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a8);
+                R.drawable.b8);
          map9 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a9);
+                R.drawable.b9);
          map0 = BitmapFactory.decodeResource(getResources(),
-                R.drawable.a0);
+                R.drawable.b0);
         map1p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point1);
+                R.drawable.bpoint1);
         map2p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point2);
+                R.drawable.bpoint2);
         map3p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point3);
+                R.drawable.bpoint3);
         map4p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point4);
+                R.drawable.bpoint4);
         map5p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point5);
+                R.drawable.bpoint5);
         map6p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point6);
+                R.drawable.bpoint6);
         map7p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point7);
+                R.drawable.bpoint7);
         map8p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point8);
+                R.drawable.bpoint8);
         map9p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point9);
+                R.drawable.bpoint9);
         map0p = BitmapFactory.decodeResource(getResources(),
-                R.drawable.point0);
+                R.drawable.bpoint0);
     }
 
 

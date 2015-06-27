@@ -30,6 +30,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
             mGLSurfaceView = new MyGLSurfaceView(this);
+
             setContentView(mGLSurfaceView);
 
             Display display = getWindowManager().getDefaultDisplay();
@@ -43,8 +44,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             mGLSurfaceView.windowSizeY=size.y;
 
             Log.d("x:",Integer.toString(size.x) );
-
-
 
             mGLSurfaceView.setFocusableInTouchMode(true);//設置為可觸控
 

@@ -14,9 +14,9 @@ import javax.microedition.khronos.opengles.GL10;
 public class DrawWhiteBlock {
 
     float[] colors = {
-            1f, 1f, 1f, 1f, // 左上角 0 red
-            1f, 1f, 1f, 1f, // 左下角 1 green
-            1f, 1f, 1f, 1f, // 右下角 2 blue
+            1f, 1f, 1f, 1f,
+            1f, 1f, 1f, 1f,
+            1f, 1f, 1f, 1f,
     };
 
     private FloatBuffer myVertexBuffer;//頂點坐標緩衝
@@ -155,7 +155,7 @@ public class DrawWhiteBlock {
 
         gl.glDrawArrays(GL10.GL_TRIANGLES, 0, vCount);//繪製圖像面
 
-        gl.glColor4f(1f, 0f, 0f, 1f);//繪製線的顏色
+        gl.glColor4f(1f, 1f, 1f, 1f);//繪製線的顏色
 
         gl.glDrawArrays(GL10.GL_LINES, 0, vCount);//繪製圖像線
 

@@ -1,11 +1,14 @@
 package netdb.course.softwarestudion.myapplication;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -29,6 +32,20 @@ public class MainActivity extends Activity implements SensorEventListener {
             mGLSurfaceView = new MyGLSurfaceView(this);
             //mGLSurfaceView.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
             setContentView(mGLSurfaceView);
+
+            Display display = getWindowManager().getDefaultDisplay();
+
+            Point size = new Point();
+
+            display.getSize(size);
+
+            mGLSurfaceView.windowSizeX=size.x;
+
+            mGLSurfaceView.windowSizeY=size.y;
+
+            Log.d("x:",Integer.toString(size.x) );
+
+
 
             mGLSurfaceView.setFocusableInTouchMode(true);//設置為可觸控
 

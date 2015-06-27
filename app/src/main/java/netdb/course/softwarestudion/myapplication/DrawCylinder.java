@@ -175,7 +175,7 @@ public class DrawCylinder
 
         //gl.glDrawArrays(GL10.GL_TRIANGLES, 0, vCount);//繪製圖像面
 
-        gl.glColor4f(1f, 0f, 0f, 1f);//繪製線的顏色
+        gl.glColor4f(1f, 1f, 1f, 1f);//繪製線的顏色
 
         gl.glDrawArrays(GL10.GL_LINES, 0, vCount);//繪製圖像線
 

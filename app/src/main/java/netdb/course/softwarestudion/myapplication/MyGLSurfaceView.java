@@ -83,7 +83,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
             case MotionEvent.ACTION_UP:
                 if(MOVING_CLOCK==0){
                     mRenderer.isTouch=true;
-                    MOVING_CLOCK = BLOCK_LENGTH;
                 }
         }
         requestRender();
@@ -131,7 +130,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
             cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
             cylinderList.get(1).deepX -= BLOCK_LENGTH;
             cylinderList.get(2).deepX -= 2*BLOCK_LENGTH;
-           // cylinder =new DrawCylinder(BLOCK_LENGTH,20f,60f,2) ;//創建圓柱體 length, circle_radius, degreespan, textureId
+
         }
 
         public void onDrawFrame(GL10 gl) {
@@ -157,9 +156,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
             float[] positionParamsRed={lx,ly,lz,0};
 
-            //gl.glLightfv(GL10.GL_LIGHT1, GL10.GL_POSITION, positionParamsRed,0);
+            gl.glLightfv(GL10.GL_LIGHT1, GL10.GL_POSITION, positionParamsRed,0);
 
-           // initMaterial(gl);//初始化紋理
+            initMaterial(gl);//初始化紋理
 
             //gl.glTranslatef(0, 0, -5f);//平移
 
@@ -167,15 +166,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
             gl.glRotatef(-45, 0, 1, 0);//旋轉
 
-          //  initLight(gl);//開燈
+            initLight(gl);//開燈
 
-            if(MOVING_CLOCK!=0){
-                for(int i=0;i<cylinderList.size();i++){
-                    cylinderList.get(i).deepX += MOVING_RATE;
-                    blockList.get(i).deepX+=MOVING_RATE;
-                }
-                MOVING_CLOCK -= MOVING_RATE;
-            }
             for(int i=0;i<cylinderList.size();i++){
 
                 autoGenerateBlock(gl,cylinderList.get(i),blockList.get(i));
@@ -194,18 +186,24 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 PixelBuffer.get(b);
                 Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
                         PixelBuffer.get(2) + " a" + PixelBuffer.get(3));
-                Log.e("Picking", " rgba: r"+ b[0] + " g" + b[1] + " b" +
-                        b[2] + " a" + b[3]);
+                if(PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 ){
+                    MOVING_CLOCK = BLOCK_LENGTH;
+                    cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
+                    cylinderList.get(cylinderList.size()-1).deepX -= 3*BLOCK_LENGTH;
+                    cylinderList.get(cylinderList.size()-1).mAngleX = cylinderList.get(cylinderList.size()-2).mAngleX;
 
-
-                cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
-                cylinderList.get(cylinderList.size()-1).deepX -= 3*BLOCK_LENGTH;
-                cylinderList.get(cylinderList.size()-1).mAngleX = cylinderList.get(cylinderList.size()-2).mAngleX;
-
-                blockList.add(new DrawWhiteBlock(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE));
-                blockList.get(blockList.size()-1).deepX -= 3*BLOCK_LENGTH;
-                blockList.get(blockList.size()-1).mAngleX = blockList.get(blockList.size()-2).mAngleX;
+                    blockList.add(new DrawWhiteBlock(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE));
+                    blockList.get(blockList.size()-1).deepX -= 3*BLOCK_LENGTH;
+                    blockList.get(blockList.size()-1).mAngleX = blockList.get(blockList.size()-2).mAngleX;
+                }
                 isTouch=false;
+            }
+            if(MOVING_CLOCK!=0){
+                for(int i=0;i<cylinderList.size();i++){
+                    cylinderList.get(i).deepX += MOVING_RATE;
+                    blockList.get(i).deepX+=MOVING_RATE;
+                }
+                MOVING_CLOCK -= MOVING_RATE;
             }
             //closeLight(gl);//關燈
             gl.glPopMatrix();//恢復變換矩陣現場
@@ -305,7 +303,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     //環境光設置
 
-        float[] ambientParams={0.2f,0.2f,0.2f,1.0f};//光參數 RGBA
+        float[] ambientParams={0.27f,0.963f,0.953f,1.0f};//光參數 RGBA
 
         gl.glLightfv(GL10.GL_LIGHT1, GL10.GL_AMBIENT, ambientParams,0);
 
@@ -343,13 +341,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     //環境光
 
-        float ambientMaterial[] = {248f/255f, 242f/255f, 144f/255f, 1.0f};
+        float ambientMaterial[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
         gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, ambientMaterial,0);
 
     //散射光
 
-        float diffuseMaterial[] = {248f/255f, 242f/255f, 144f/255f, 1.0f};
+        float diffuseMaterial[] = {1f, 1f, 1f, 1.0f};
 
         gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, diffuseMaterial,0);
 

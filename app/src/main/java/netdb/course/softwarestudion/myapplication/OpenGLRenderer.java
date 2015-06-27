@@ -3,9 +3,11 @@ package netdb.course.softwarestudion.myapplication;
 import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.opengl.GLUtils;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+
 /**
  * Created by Waiting on 2015/6/25.
  */
@@ -37,44 +39,10 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer
         // 復原成最後的矩陣
         gl.glPopMatrix();
 
-        // 第二個方形
-        // 存儲目前陣列
-        gl.glPushMatrix();
-        // 在移動前先旋轉, 讓第二個方形圍繞著第一個方形旋轉
-        gl.glRotatef(-angle, 0, 0.5f, 0);
-        // 移動第二個方形
-        gl.glTranslatef(2, 0, 0);
-        // 調整其大小為第一個方形的一半
-        gl.glScalef(.5f, .5f, .5f);
-        gl.glRotatef(angle*5, 0.5f, 1, 0);
-        // 畫出第二個方形
-        square.draw(gl);
-
-        // 第三個方形
-        // 存儲目前陣列
-        gl.glPushMatrix();
-        // 讓第三個方形圍繞著第二個方形旋轉
-        gl.glRotatef(-angle, 0,0.5f, 0);
-        // 移動第三個方形
-        gl.glTranslatef(2, 0, 0);
-        // 調整其大小為第二個方形的一半
-        gl.glScalef(.5f, .5f, .5f);
-        // 以自己為中心旋轉
-        gl.glRotatef(angle * 10, 0, 0.5f ,0);
-        // 畫出第三個方形.
-        square.draw(gl);
-
-        // 復原成第三個方形前的矩陣
-        gl.glPopMatrix();
-        // 復原成第二個方形前的矩陣.
-        gl.glPopMatrix();
-
         // 增加角度
         angle++;
         // 畫出方形
        // square.draw(gl);
-
-
     }
 
     @Override
@@ -98,7 +66,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         // TODO Auto-generated method stub
         // 設定背景顏色為黑色, 格式是RGBA
-        gl.glClearColor(0.2f, 0.5f, 0.2f, 0.5f);
+        gl.glClearColor(0.2f, 0.5f, 0.2f, 0);
         // 設定流暢的陰影模式
         gl.glShadeModel(GL10.GL_SMOOTH);
         // 深度緩區的設定
@@ -109,13 +77,11 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer
         gl.glDepthFunc(GL10.GL_LEQUAL);
         // 設定很好的角度計算模式
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
+
     }
     public void setBitmap(Bitmap bitmap) {
         // TODO Auto-generated method stub
         square.setBitmap(bitmap);
     }
-
-
-
 
 }

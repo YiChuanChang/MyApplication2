@@ -5,11 +5,14 @@ package netdb.course.softwarestudion.myapplication;
  */
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.hardware.SensorEvent;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import java.io.IOException;
@@ -22,17 +25,11 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-
-import android.text.TextPaint;
-import android.text.StaticLayout;
-import android.text.Layout.Alignment;
-import android.util.Log;
-
 public class MyGLSurfaceView extends GLSurfaceView {
+
+        private SharedPreferences settingsActivity;
+
+      private MainActivity mainActivity;
 
         public Timer timer;
 
@@ -69,9 +66,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
         Bitmap map0p, map1p, map2p, map3p, map4p, map5p, map6p, map7p, map8p, map9p;
 
 
-        public MyGLSurfaceView(Context context) {
+        public MyGLSurfaceView(Context context, SharedPreferences settingsActivity,MainActivity mainActivity) {
 
                 super(context);
+
+                this.mainActivity=mainActivity;
+
+                this.settingsActivity=settingsActivity;
 
                 mRenderer = new SceneRenderer(); //創建場景渲染器
 
@@ -161,6 +162,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         int textureId;//紋理名稱ID
         private boolean isTouch;
+        int score=0;
         private float touchX,touchY;
         ArrayList<DrawCylinder> cylinderList;
         ArrayList<DrawWhiteBlock> blockList;
@@ -190,6 +192,16 @@ public class MyGLSurfaceView extends GLSurfaceView {
         }
 
         public void onDrawFrame(GL10 gl) {
+            if(timeCount<=0){
+                int highScore=settingsActivity.getInt("HighScore",0);
+                if(score>highScore){
+                    SharedPreferences.Editor editor =settingsActivity.edit();
+                    editor.putInt("HighScore", score);
+                    editor.commit();
+                }
+                mainActivity.onGameOver();
+
+            }
         //清除顏色緩存
 
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
@@ -255,6 +267,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                /* Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
                         PixelBuffer.get(2) + " a" + PixelBuffer.get(3));*/
                 if(PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 ){
+                    score++;
                     MOVING_CLOCK = BLOCK_LENGTH;
                     cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
                     cylinderList.get(cylinderList.size()-1).deepX -= 3*BLOCK_LENGTH;

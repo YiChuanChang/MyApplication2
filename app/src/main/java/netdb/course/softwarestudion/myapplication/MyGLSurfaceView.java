@@ -22,9 +22,17 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+
 public class MyGLSurfaceView extends GLSurfaceView {
 
-        Timer timer;
+        public Timer timer;
+
+        public boolean ifTimerStart;
+
         private final float TOUCH_SCALE_FACTOR = 180.0f/320;//角度縮放比例
 
         public int windowSizeX;
@@ -34,6 +42,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
         public int windowSizeY;
 
     private final float ROTATE_ANGLE = 3f;
+
+    private final float SECTION_ANGLE = 45f;
 
     private final float BLOCK_LENGTH = 20f;
 
@@ -61,9 +71,11 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         MOVING_RATE = 4;
 
+        timeCount=0.0f;
 
-            timeCount=0.0f;
+        timer =new Timer();
 
+        ifTimerStart = false;
 
 
     }
@@ -102,6 +114,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
             case MotionEvent.ACTION_UP:
                 if(MOVING_CLOCK==0){
                     mRenderer.isTouch=true;
+                }
+                if(!ifTimerStart){
+                    timer.start();
+                    ifTimerStart = true;
                 }
         }
         requestRender();
@@ -154,6 +170,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
         }
 
         public void onDrawFrame(GL10 gl) {
+
+
         //清除顏色緩存
 
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
@@ -234,6 +252,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
             }
             //closeLight(gl);//關燈
             gl.glPopMatrix();//恢復變換矩陣現場
+            initFontBitmap();
 
         }
         public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -261,7 +280,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         }
 
    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
+            initFontBitmap();
         //關閉抗抖動
 
             gl.glDisable(GL10.GL_DITHER);
@@ -303,10 +322,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
                       }
                   }
               }.start();
-
-       timer =new Timer();
-       timer.start();
-
 
    }
 
@@ -438,6 +453,20 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         return currTextureId;
 
+    }
+
+    public void initFontBitmap(){
+        String font = timer.toString();
+        Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);          //背景颜色
+        canvas.drawColor(Color.LTGRAY);
+        Paint p = new Paint();          //字体设置
+        String fontType = "TimeNews";
+        Typeface typeface = Typeface.create(fontType, Typeface.BOLD);          //消除锯齿
+        p.setAntiAlias(true);          //字体为红色
+        p.setColor(Color.RED);          p.setTypeface(typeface);
+        p.setTextSize(28);          //绘制字体
+        canvas.drawText(font, 0, 100, p);
     }
 
 

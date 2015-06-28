@@ -35,14 +35,14 @@ public class Cube {
        };
 
         int colors[] = {
-                0,    0,    0,  one,
-                one,    0,    0,  one,
-                one,  one,    0,  one,
-                0,  one,    0,  one,
-                0,    0,  one,  one,
-                one,    0,  one,  one,
-                one,  one,  one,  one,
-                0,  one,  one,  one,
+                one,    one,    one,  one,
+                one,    one,    one,  one,
+                one,    one,    one,  one,
+                one,    one,    one,  one,
+                one,    one,    one,  one,
+                one,    one,    one,  one,
+                one,    one,    one,  one,
+                one,    one,    one,  one,
         };
 
         byte indices[] = {
@@ -82,16 +82,19 @@ public class Cube {
     public void draw(GL10 gl)
     {
         gl.glFrontFace(gl.GL_CW);
+        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);//打開頂點緩衝
+
         gl.glVertexPointer(3, gl.GL_FLOAT, 0, mVertexBuffer);
         gl.glColor4f(1f, 1f, 1f, 1f);//繪製線的顏色
-        gl.glDrawArrays(GL10.GL_LINE_LOOP, 0,4);//繪製圖像線
+        gl.glColorPointer(4, gl.GL_FIXED, 0, mColorBuffer);
+        gl.glDrawArrays(GL10.GL_LINE_LOOP, 0, 4);//繪製圖像線
         gl.glDrawArrays(GL10.GL_LINE_LOOP, 4, 4);
         gl.glDrawArrays(GL10.GL_LINE_LOOP, 8, 4);
         gl.glDrawArrays(GL10.GL_LINE_LOOP, 12, 4);
         gl.glDrawArrays(GL10.GL_LINE_LOOP, 16, 4);
         gl.glDrawArrays(GL10.GL_LINE_LOOP, 20, 4);
 
-        // gl.glColorPointer(4, gl.GL_FIXED, 0, mColorBuffer);
+
         // gl.glDrawElements(gl.GL_TRIANGLES, 36, gl.GL_UNSIGNED_BYTE, mIndexBuffer);
     }
 

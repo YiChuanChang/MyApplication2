@@ -13,7 +13,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class OpenGLRenderer implements GLSurfaceView.Renderer {
     private Cube cube;
     private float angle = 0;
-
+    public int highscore;
     public OpenGLRenderer() {
         // 初始化
         cube = new Cube();

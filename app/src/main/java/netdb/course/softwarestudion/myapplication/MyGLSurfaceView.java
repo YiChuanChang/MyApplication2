@@ -28,9 +28,11 @@ import javax.microedition.khronos.opengles.GL11;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 
+        public int score=0;
+
         private SharedPreferences settingsActivity;
 
-      private Handler handler;
+        private Handler handler;
 
         public Timer timer;
 
@@ -52,21 +54,21 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         private final float CYLINDER_RADIUS = 15f;
 
-        private final float COUNT_DOWN = 25F;
+        private final float COUNT_DOWN = 5F;
 
         private float MOVING_CLOCK;
 
         private float MOVING_RATE;
 
-        private SceneRenderer mRenderer;//場景渲染器
+        public  SceneRenderer mRenderer;//場景渲染器
 
         private int lightAngle=90;//燈的當前角度
 
         private static Canvas canvas;
 
-        Bitmap map0,  map1,  map2,  map3,  map4,  map5,  map6,  map7,  map8,  map9;
+        public Bitmap map0,  map1,  map2,  map3,  map4,  map5,  map6,  map7,  map8,  map9;
 
-        Bitmap map0p, map1p, map2p, map3p, map4p, map5p, map6p, map7p, map8p, map9p;
+        public Bitmap map0p, map1p, map2p, map3p, map4p, map5p, map6p, map7p, map8p, map9p;
 
 
         public MyGLSurfaceView(Context context, SharedPreferences settingsActivity,Handler handler) {
@@ -138,7 +140,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
                     ifTimerStart = true;
                 }
         }
-        requestRender();
         return true;
 
     }
@@ -155,14 +156,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
             }
         }
 
-
-        requestRender();
         return true;
     }
 
     private class SceneRenderer implements GLSurfaceView.Renderer
     {
-        int score=0;
+
         int textureId;//紋理名稱ID
         private boolean isTouch;
         private float touchX,touchY;
@@ -195,16 +194,18 @@ public class MyGLSurfaceView extends GLSurfaceView {
         }
 
         public void onDrawFrame(GL10 gl) {
+            System.gc();
             if(COUNT_DOWN-timeCount<=0  ){
                 int highScore=settingsActivity.getInt("HighScore",0);
+                System.out.println(highScore);
+                System.out.println(score);
                 if(score>highScore){
                     SharedPreferences.Editor editor =settingsActivity.edit();
                     editor.putInt("HighScore", score);
+
                     editor.commit();
                 }
                 handler.sendMessage(Message.obtain(handler, 0));
-
-
             }
         //清除顏色緩存
 
@@ -290,7 +291,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
                         timer.interrupt();
                         System.out.println(timeCount);
                     }
-                    handler.sendMessage(Message.obtain(handler, 0));
+                   handler.sendMessage(Message.obtain(handler, 0));
+
                 }
                 isTouch=false;
             }
@@ -303,7 +305,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
             }
             //closeLight(gl);//關燈
             gl.glPopMatrix();//恢復變換矩陣現場
-
 
         }
         public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -424,6 +425,16 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         }
 
+
+
+    }
+
+    public void freeBitmap(){
+        map0.recycle();  map1.recycle();  map2.recycle();  map3.recycle();  map4.recycle();
+        map5.recycle();  map6.recycle();  map7.recycle();  map8.recycle();  map9.recycle();
+        map0p.recycle(); map1p.recycle(); map2p.recycle(); map3p.recycle(); map4p.recycle();
+        map5p.recycle(); map6p.recycle(); map7p.recycle(); map8p.recycle(); map9p.recycle();
+        System.gc();
     }
 
     public void autoGenerateBlock(GL10 gl,DrawCylinder cylinder,DrawWhiteBlock block){

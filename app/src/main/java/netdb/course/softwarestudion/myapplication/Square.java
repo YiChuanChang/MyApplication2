@@ -17,17 +17,17 @@ import android.opengl.GLUtils;
 
 public class Square {
     // 點的陣列
-    private float vertices[] = {0.0f, .0f, -1.0f,  // 0, 左上角
+    private float vertices[] = {0.0f, 0.0f, -1.0f,  // 0, 左上角
             0.0f, 0.0f, -3.0f,  // 1, 左下角
             0.0f, 1.0f, -3.0f,  // 2, 右下角
             0.0f, 1.0f, -1.0f, // 3, 右上角
     };
 
     // 將顏色資訊對應到點陣列上
-    float[] colors = { 0f, 0f, 1f, 1f, // 左上角 0 red
-            0f, 0f, 1f, 1f, // 左下角 1 green
-            0f, 0f, 1f, 1f, // 右下角 2 blue
-            0f, 0f, 1f, 1f, // 右上角 3 magenta
+    float[] colors = { 1f, 1f, 1f, 1f, // 左上角 0 red
+            1f, 1f, 1f, 1f, // 左下角 1 green
+            1f, 1f, 1f, 1f, // 右下角 2 blue
+            1f, 1f, 1f, 1f, // 右上角 3 magenta
     };
 
     // 質地坐標
@@ -121,6 +121,7 @@ public class Square {
         gl.glTexParameterf(GL10.GL_TEXTURE_2D,
                 GL10.GL_TEXTURE_MIN_FILTER,
                 GL10.GL_NEAREST);
+
         gl.glTexParameterf(GL10.GL_TEXTURE_2D,
                 GL10.GL_TEXTURE_MAG_FILTER,
                 GL10.GL_NEAREST);
@@ -139,6 +140,8 @@ public class Square {
         // 除能點的緩衝區
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
         // 除能CULL_FACE
+        gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+
         gl.glDisable(GL10.GL_CULL_FACE);
 
         // 除能UV坐標

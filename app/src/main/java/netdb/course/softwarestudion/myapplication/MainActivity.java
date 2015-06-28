@@ -78,12 +78,13 @@ public class MainActivity extends Activity implements SensorEventListener {
         gyro = mgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);//取得陀螺儀的偵測
     }
     public void onGameOver(){
-        GLSurfaceView view = new GLSurfaceView(this);
-        OpenGLRenderer render = new OpenGLRenderer();
-
+        ScoreGLSurfaceView view = new ScoreGLSurfaceView(this);
         // 載入位元圖
-        view.setRenderer(render);
-
+        int highScore = settingsActivity.getInt("HighScore",0);
+        view.setScore(highScore, mGLSurfaceView.score);
+        //mGLSurfaceView.mRenderer= null;
+        //mGLSurfaceView = null;
+        System.gc();
         setContentView(view);
     }
 
@@ -106,7 +107,9 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
 
         public void onSensorChanged(SensorEvent event){
-            mGLSurfaceView.onSensorEvent(event);
+            if(mGLSurfaceView!=null){
+                mGLSurfaceView.onSensorEvent(event);
+            }
         }
 
     }

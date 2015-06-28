@@ -39,7 +39,6 @@ public class Start extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(Start.this, MainActivity.class);
                 startActivity(intent);
-                finish();
             }
         }
         );

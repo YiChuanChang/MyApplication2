@@ -54,7 +54,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         private final float CYLINDER_RADIUS = 15f;
 
-        private final float COUNT_DOWN = 5F;
+        private final float COUNT_DOWN = 29F;
 
         private float MOVING_CLOCK;
 
@@ -132,13 +132,16 @@ public class MyGLSurfaceView extends GLSurfaceView {
             mRenderer.touchY = e.getY();
             switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
-                if(MOVING_CLOCK==0){
-                    mRenderer.isTouch=true;
+                if(e.getRawY()>400){
+                    if(MOVING_CLOCK==0){
+                        mRenderer.isTouch=true;
+                    }
+                    if(!ifTimerStart){
+                        timer.start();
+                        ifTimerStart = true;
+                    }
                 }
-                if(!ifTimerStart){
-                    timer.start();
-                    ifTimerStart = true;
-                }
+
         }
         return true;
 
@@ -163,7 +166,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
     {
 
         int textureId;//紋理名稱ID
+        private boolean isEnd;
         private boolean isTouch;
+        private boolean isWhite;
         private float touchX,touchY;
         ArrayList<DrawCylinder> cylinderList;
         ArrayList<DrawWhiteBlock> blockList;
@@ -173,6 +178,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
         public SceneRenderer()
         {
             isTouch=false;
+            isWhite=false;
+            isEnd=false;
             blockList=new ArrayList();
             blockList.add(new DrawWhiteBlock(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE));
             blockList.add(new DrawWhiteBlock(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE));
@@ -195,14 +202,16 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         public void onDrawFrame(GL10 gl) {
             System.gc();
-            if(COUNT_DOWN-timeCount<=0  ){
+            if(COUNT_DOWN-timeCount<=0 && !isEnd ){
+                isEnd=true;
                 int highScore=settingsActivity.getInt("HighScore",0);
-                System.out.println(highScore);
-                System.out.println(score);
+                //System.out.println(highScore);
+                System.out.println("score:"+score);
                 if(score>highScore){
-                    SharedPreferences.Editor editor =settingsActivity.edit();
-                    editor.putInt("HighScore", score);
 
+                    SharedPreferences.Editor editor =settingsActivity.edit();
+                    System.out.println("High:"+settingsActivity.getInt("HighScore",0));
+                    editor.putInt("HighScore", score);
                     editor.commit();
                 }
                 handler.sendMessage(Message.obtain(handler, 0));
@@ -262,18 +271,30 @@ public class MyGLSurfaceView extends GLSurfaceView {
             gl.glPopMatrix();
             if(isTouch){
 
-                ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(4);
+                ByteBuffer PixelBuffer = ByteBuffer.allocateDirect(4*64);
                 PixelBuffer.order(ByteOrder.nativeOrder());
                 PixelBuffer.position(0);
-                int mTemp = 0;
-               // System.out.println(touchY);
-                gl.glReadPixels(Math.round(touchX), windowSizeY-Math.round(touchY), 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, PixelBuffer);
-                // Log.e("Picking", " xy: x" + x + " y"+ y);
-                byte b [] = new byte[4];
+                gl.glReadPixels(Math.round(touchX)-4, windowSizeY-Math.round(touchY)-4, 8, 8, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, PixelBuffer);
+
+                byte b [] = new byte[4*64];
                 PixelBuffer.get(b);
+                for(int i=0;i<b.length;i++){
+                    if(i%4==3){
+                        i++;
+                        if(i>=b.length){
+                            isWhite=false;
+                            break;
+                        }
+                    }
+                    if(b[i]!=0){
+                        isWhite=true;
+                        break;
+                    }
+
+                }
                /* Log.e("Picking", " rgba: r" + PixelBuffer.get(0) + " g" + PixelBuffer.get(1) + " b" +
                         PixelBuffer.get(2) + " a" + PixelBuffer.get(3));*/
-                if(PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 && PixelBuffer.get(0)!=0 ){
+                if(isWhite){
                     score++;
                     MOVING_CLOCK = BLOCK_LENGTH;
                     cylinderList.add(new DrawCylinder(BLOCK_LENGTH,CYLINDER_RADIUS,SECTION_ANGLE,2));
@@ -289,8 +310,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                         timer.stopThread();
                         timer.interrupt();
-                        System.out.println(timeCount);
+                       // System.out.println(timeCount);
                     }
+                    score=0;
                    handler.sendMessage(Message.obtain(handler, 0));
 
                 }

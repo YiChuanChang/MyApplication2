@@ -8,10 +8,13 @@ import android.graphics.Canvas;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import android.graphics.PixelFormat;
+import android.view.MotionEvent;
 
 /**
  * Created by yi_chiuan on 2015/6/28.
@@ -23,16 +26,34 @@ public class ScoreGLSurfaceView extends GLSurfaceView {
     public int scoreNow;
     public Bitmap map0,  map1,  map2,  map3,  map4,  map5,  map6,  map7,  map8,  map9;
     public Bitmap map0p, map1p, map2p, map3p, map4p, map5p, map6p, map7p, map8p, map9p;
+    Handler handler;
 
-    public  ScoreGLSurfaceView(Context context) {
+    public  ScoreGLSurfaceView(Context context,Handler handler) {
 
         super(context);
 
         read_bitmap();
 
+        setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+
+        getHolder() .setFormat(PixelFormat.TRANSLUCENT);
+
         mRenderer = new OpenGLRenderer(); //創建場景渲染器
 
         setRenderer(mRenderer);
+
+        this.handler=handler;
+
+    }
+
+    public boolean onTouchEvent(MotionEvent e) {
+
+
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                handler.sendMessage(Message.obtain(handler, 1));
+        }
+        return true;
 
     }
 
@@ -111,6 +132,7 @@ public class ScoreGLSurfaceView extends GLSurfaceView {
             // 清除螢幕和深度緩衝區
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
             // 以單位矩陣取代目前的矩陣
+            gl.glClearColor(0,0,0,0);
             gl.glLoadIdentity();
             // Z軸轉置 10 單位
             gl.glPushMatrix();
@@ -133,12 +155,12 @@ public class ScoreGLSurfaceView extends GLSurfaceView {
             //gl.glTranslatef(-2, 0, 0);
 
             set_square();
-            gl.glTranslatef(-4f, 0f,  -2);
+            gl.glTranslatef(-4f, 0f,  3);
             scoreSquare.draw(gl);
             gl.glTranslatef(0,   -1f,  0);
             scoreSquareTen.draw(gl);
 
-            gl.glTranslatef(2f, 1f,  0);
+            gl.glTranslatef(2.9f, 1f,  -2);
             highScoreSquare.draw(gl);
             gl.glTranslatef(0,   -1f,  0);
             highScoreSquareTen.draw(gl);
@@ -181,13 +203,13 @@ public class ScoreGLSurfaceView extends GLSurfaceView {
             // GL_LEQUAL深度函式測試
             gl.glDepthFunc(GL10.GL_LEQUAL);
             // 設定很好的角度計算模式
-            gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
+            gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
 
         }
 
         private void set_square() {
 
-           Log.d("scoreNow", Float.toString(scoreNow%10));
+          // Log.d("scoreNow", Float.toString(scoreNow%10));
 
             //ten
             switch (scoreNow/10) {
@@ -216,7 +238,7 @@ public class ScoreGLSurfaceView extends GLSurfaceView {
                 case 9:scoreSquare.setBitmap(map9);break;
             }
             //ten
-            switch (scoreNow/10) {
+            switch (highScore%10) {
                 case 0:highScoreSquare.setBitmap(map0);break;
                 case 1:highScoreSquare.setBitmap(map1);break;
                 case 2:highScoreSquare.setBitmap(map2);break;

@@ -37,6 +37,9 @@ public class MainActivity extends Activity implements SensorEventListener {
                     case 0:
                         onGameOver();
                         break;
+                    case 1:
+                        finish();
+                        break;
                 }
             }
         };
@@ -78,7 +81,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         gyro = mgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);//取得陀螺儀的偵測
     }
     public void onGameOver(){
-        ScoreGLSurfaceView view = new ScoreGLSurfaceView(this);
+        ScoreGLSurfaceView view = new ScoreGLSurfaceView(this,handler);
         // 載入位元圖
         int highScore = settingsActivity.getInt("HighScore",0);
         view.setScore(highScore, mGLSurfaceView.score);

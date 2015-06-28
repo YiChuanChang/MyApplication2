@@ -24,10 +24,10 @@ public class Square {
     };
 
     // 將顏色資訊對應到點陣列上
-    float[] colors = { 1f, 1f, 1f, 1f, // 左上角 0 red
-            1f, 1f, 1f, 1f, // 左下角 1 green
-            1f, 1f, 1f, 1f, // 右下角 2 blue
-            1f, 1f, 1f, 1f, // 右上角 3 magenta
+    float[] colors = { 1f, 1f, 1f, 0f, // 左上角 0 red
+            1f, 1f, 1f, 0f, // 左下角 1 green
+            1f, 1f, 1f, 0f, // 右下角 2 blue
+            1f, 1f, 1f, 0f, // 右上角 3 magenta
     };
 
     // 質地坐標

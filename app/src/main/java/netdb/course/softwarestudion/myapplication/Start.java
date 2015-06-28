@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.view.Window;
 import android.view.WindowManager;
+import android.content.pm.ActivityInfo;
 import android.widget.ImageButton;
 
 
@@ -27,6 +28,7 @@ public class Start extends Activity {
 
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);

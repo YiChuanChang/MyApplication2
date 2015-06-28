@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.content.pm.ActivityInfo;
 
 
 /**
@@ -27,7 +28,9 @@ public class About extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_about);
         btn_return = (Button) findViewById(R.id.btn_return);
         btn_return.setOnClickListener(new Button.OnClickListener() {
